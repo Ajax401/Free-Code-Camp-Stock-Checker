@@ -66,7 +66,7 @@ module.exports = function (app) {
          relLikes === relLikes1?differentLikes = relLikes:null;
          relLikes1 === relLikes?differentLikes1 = relLikes1:null;
          res.status(200).json({
-          stockData:[{stock:data[0].stock,price:currentPrice,rel_likes:differentLikes},{stock:data[1].stock,price:currentPrice1,rel_likes:differentLikes1}]
+          stockData:[{stock:data[0].stock,price:currentPrice1,rel_likes:differentLikes},{stock:data[1].stock,price:currentPrice,rel_likes:differentLikes1}]
         })
        })
         }
@@ -105,7 +105,7 @@ module.exports = function (app) {
          relLikes === relLikes1?differentLikes = relLikes:null;
          relLikes1 === relLikes?differentLikes1 = relLikes1:null;
          res.status(200).json({
-          stockData:[{stock:data[0].stock,price:currentPrice,rel_likes:differentLikes},{stock:data[1].stock,price:currentPrice1,rel_likes:differentLikes1}]
+          stockData:[{stock:data[0].stock,price:currentPrice1,rel_likes:differentLikes},{stock:data[1].stock,price:currentPrice,rel_likes:differentLikes1}]
         })
        })
         }
@@ -218,7 +218,7 @@ module.exports = function (app) {
                   relLikes === relLikes1?differentLikes = relLikes:null;
                   relLikes1 === relLikes?differentLikes1 = relLikes1:null;
             res.status(200).json({
-              stockData:[{stock:data[0].stock,price:currentPrice,rel_likes:differentLikes, ips:"You have already voted for this stock.Please choose another stock and tick like."},{stock:data[1].stock,price:currentPrice1,rel_likes:differentLikes1, ips:"You have already voted for this stock.Please choose another stock and tick like."}]
+              stockData:[{stock:data[0].stock,price:currentPrice1,rel_likes:differentLikes, ips:"You have already voted for this stock.Please choose another stock and tick like."},{stock:data[1].stock,price:currentPrice,rel_likes:differentLikes1, ips:"You have already voted for this stock.Please choose another stock and tick like."}]
               })
             })
           }
@@ -266,7 +266,7 @@ module.exports = function (app) {
                   relLikes === relLikes1?differentLikes = relLikes:null;
                   relLikes1 === relLikes?differentLikes1 = relLikes1:null;
                   res.status(200).json({
-                    stockData:[{stock:data[0].stock,price:currentPrice,rel_likes:differentLikes},{stock:data[1].stock,price:currentPrice1,rel_likes:differentLikes1}]
+                    stockData:[{stock:data[0].stock,price:currentPrice1,rel_likes:differentLikes},{stock:data[1].stock,price:currentPrice,rel_likes:differentLikes1}]
                     })
             })
           }

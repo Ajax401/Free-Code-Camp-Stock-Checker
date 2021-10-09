@@ -59,11 +59,11 @@ suite('Functional Tests', function() {
         .query({stock:['GOOG','MSFT'],like:'true'})
         .end((err,res)=>{
           assert.equal(res.status,200)
-          assert.equal(res.body.stockData[0].stock,'MSFT')
+          assert.equal(res.body.stockData[0].stock,'GOOG')
           assert.equal(res.body.stockData[0].rel_likes,2)
           assert.exists(res.body.stockData[0].price,'Stock price has been returned')
-          assert.equal(res.body.stockData[1].stock,'GOOG')
-          assert.equal(res.body.stockData[1].rel_likes,2)
+          assert.equal(res.body.stockData[1].stock,'MSFT')
+          assert.equal(res.body.stockData[1].rel_likes,-1)
           assert.exists(res.body.stockData[1].price,'Stock price has been returned')
           done();
         }) 
@@ -77,12 +77,12 @@ suite('Functional Tests', function() {
         .end((err,res)=>{
           console.log(res.body.stockData[0])
           assert.equal(res.status,200)
-          assert.equal(res.body.stockData[0].stock,'MSFT')
+          assert.equal(res.body.stockData[0].stock,'GOOG')
           assert.equal(res.body.stockData[0].rel_likes,2)
           assert.strictEqual(res.body.stockData[0].ips,'You have already voted for this stock.Please choose another stock and tick like.')
           assert.exists(res.body.stockData[0].price,'Stock price has been returned')
-          assert.equal(res.body.stockData[1].stock,'GOOG')
-          assert.equal(res.body.stockData[1].rel_likes,2)
+          assert.equal(res.body.stockData[1].stock,'MSFT')
+          assert.equal(res.body.stockData[1].rel_likes,-1)
           assert.strictEqual(res.body.stockData[1].ips,'You have already voted for this stock.Please choose another stock and tick like.')
           assert.exists(res.body.stockData[1].price,'Stock price has been returned')
           done();

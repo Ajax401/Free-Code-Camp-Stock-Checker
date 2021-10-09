@@ -29,21 +29,20 @@ module.exports = function (app) {
       }
 
      responseTwo().then(([data, data1]) => {
-     //console.log(data, data1)
-     //console.log(data1)
+     
      let myVal = data.symbol,
          myVal1 = data1.symbol,
          currentPrice = data.latestPrice,
          currentPrice1 = data1.latestPrice,
          viewLike = 0,
          findMe = {stock:myVal},
-         findMe1 = {stock:myVal1};
+         findMe1 = {stock:myVal1},
+         myIp = {ips:ip};
          like == 'true'?viewLike=1:viewLike;
-         //console.log(myVal)
+         
 
-   stockData.exists({stock:{$in:[myVal,myVal1]}}).then(check =>{
-      //console.log(like)
-
+   stockData.exists(findMe,findMe1).then(check =>{
+      
        if(!myVal&&!myVal1){
 
          res.status(200).json({
@@ -55,20 +54,54 @@ module.exports = function (app) {
       if(check&&!like){
 
         if(myVal&&myVal1){
-         stockData.find({stock:{$in:[myVal,myVal1]}}).then(data =>{
-         
-         let relLikes = data[0].likes,
-             relLikes1 = data[1].likes,
-             differentLikes,
-             differentLikes1;
-         relLikes < relLikes1?differentLikes = relLikes - relLikes1:differentLikes = Math.abs(relLikes - relLikes1);
-         relLikes1 < relLikes?differentLikes1 = relLikes1 - relLikes:differentLikes1 = Math.abs(relLikes1 - relLikes);
-         relLikes === relLikes1?differentLikes = relLikes:null;
-         relLikes1 === relLikes?differentLikes1 = relLikes1:null;
-         res.status(200).json({
-          stockData:[{stock:data[0].stock,price:currentPrice1,rel_likes:differentLikes},{stock:data[1].stock,price:currentPrice,rel_likes:differentLikes1}]
-        })
-       })
+            
+          async function double () {
+        
+             const res = await stockData.bulkWrite([
+              { 
+               updateOne: {
+                filter: {
+                  stock: myVal
+                  },
+                update: {
+                 $set: {
+                  price:currentPrice
+                  }
+                      }
+                        }
+                },
+               { 
+               updateOne: {
+                filter: {
+                  stock: myVal1
+                        },
+                  update: {
+                $set: {
+                  price:currentPrice1
+                      }
+                        } 
+                 }
+                }
+              ]);
+              
+              
+              return res; 
+            }
+            double().then(data =>{
+            
+            stockData.find({stock:{$in:[myVal,myVal1]}}).then(data =>{
+              
+              let relLikes = data[0].likes,
+                  relLikes1 = data[1].likes,
+                  differentLikes,
+                  differentLikes1;
+                  relLikes < relLikes1?differentLikes = relLikes - relLikes1:differentLikes = relLikes;
+                  relLikes1 < relLikes?differentLikes1 = relLikes1 - relLikes:differentLikes1 = relLikes1;
+            res.status(200).json({
+              stockData:[{stock:data[0].stock,price:data[0].price,rel_likes:differentLikes},{stock:data[1].stock,price:data[1].price,rel_likes:differentLikes1}]
+              })
+            })
+         })
         }
 
         if(myVal&&!myVal1){
@@ -94,28 +127,52 @@ module.exports = function (app) {
       if(check&&like == 'false'){
 
         if(myVal&&myVal1){
-         stockData.find({stock:{$in:[myVal,myVal1]}}).then(data =>{
-         
-         let relLikes = data[0].likes,
-             relLikes1 = data[1].likes,
-             differentLikes,
-             differentLikes1;
-         relLikes < relLikes1?differentLikes = relLikes - relLikes1:differentLikes = Math.abs(relLikes - relLikes1);
-         relLikes1 < relLikes?differentLikes1 = relLikes1 - relLikes:differentLikes1 = Math.abs(relLikes1 - relLikes);
-         relLikes === relLikes1?differentLikes = relLikes:null;
-         relLikes1 === relLikes?differentLikes1 = relLikes1:null;
-         res.status(200).json({
-          stockData:[{stock:data[0].stock,price:currentPrice1,rel_likes:differentLikes},{stock:data[1].stock,price:currentPrice,rel_likes:differentLikes1}]
-        })
-       })
-        }
-
-        if(myVal&&!myVal1){
-          stockData.findOne(findMe).then(data =>{
-         res.status(200).json({
-        stockData:[{stock:data.stock,price:currentPrice,likes:data.likes},{error:`erorr no stock named ${stockTwo} in database`}]
-        })
-       })
+          async function double () {
+      
+             const res = await stockData.bulkWrite([
+              { 
+               updateOne: {
+                filter: {
+                  stock: myVal
+                  },
+                update: {
+                 $set: {
+                  price:currentPrice
+                  }
+                      }
+                        }
+                },
+               { 
+               updateOne: {
+                filter: {
+                  stock: myVal1
+                        },
+                  update: {
+                $set: {
+                  price:currentPrice1
+                      }
+                        } 
+                 }
+                }
+              ]);
+              
+              
+              return res; 
+            }
+            double().then(data =>{
+            stockData.find({stock:{$in:[myVal,myVal1]}}).then(data =>{
+              
+              let relLikes = data[0].likes,
+                  relLikes1 = data[1].likes,
+                  differentLikes,
+                  differentLikes1;
+                  relLikes < relLikes1?differentLikes = relLikes - relLikes1:differentLikes = relLikes;
+                  relLikes1 < relLikes?differentLikes1 = relLikes1 - relLikes:differentLikes1 = relLikes1;
+            res.status(200).json({
+              stockData:[{stock:data[0].stock,price:data[0].price,rel_likes:differentLikes},{stock:data[1].stock,price:data[1].price,rel_likes:differentLikes1}]
+              })
+            })
+         })
         }
 
        if(!myVal&&myVal1){
@@ -128,6 +185,35 @@ module.exports = function (app) {
 
       }
      
+      
+     
+     if(!check&&myVal&&myVal1&&like == 'true'){
+           let firstStock = {
+           stock:myVal,
+            price:currentPrice,
+            likes:viewLike,
+            ips:[ip]
+           };
+
+         let secondStock = {
+          stock:myVal1,
+          price:currentPrice,
+          likes:viewLike,
+          ips:[ip]
+
+         }
+
+        let stocks = [firstStock,secondStock]
+
+        stockData.insertMany(stocks).then(data =>{
+      
+         res.status(200).json({
+           stockData:[{stock:data[0].stock,price:data[0].price,rel_likes:viewLike},{stock:data[1].stock,price:data[1].price,rel_likes:viewLike}]
+        })
+      
+        
+        })
+     }
 
      if(!check&&like == 'false'){
 
@@ -187,88 +273,120 @@ module.exports = function (app) {
     if(check&&like == 'true'){
 
       if(myVal&&myVal1){
-        stockData.exists({stock:{$in:[myVal,myVal1,ip]}}).then(info =>{
+        
+        stockData.exists({stock:[myVal,myVal1],ips:ip}).then(info =>{
+        
           if(info){
-              let update ={
-               $set:{
-                price:currentPrice
-               }
-               }
-               let update1 ={
-               $set:{
-                price:currentPrice1
-               }
-               }
-            
-            stockData.updateOne(findMe,update).then(data =>{
-                console.log(data)
-             })
-
-            stockData.updateOne(findMe1,update1).then(data =>{
-                console.log(data)
-            })
-            
-            stockData.find({stock:{$in:[myVal,myVal1]}}).then(data =>{
+               async function double () {
+      
+             const res = await stockData.bulkWrite([
+              { 
+               updateOne: {
+                filter: {
+                  stock: myVal
+                  },
+                update: {
+                 $set: {
+                  price:currentPrice
+                  }
+                      }
+                        }
+                },
+               { 
+               updateOne: {
+                filter: {
+                  stock: myVal1
+                        },
+                  update: {
+                $set: {
+                  price:currentPrice1
+                      }
+                        } 
+                 }
+                }
+              ]);
+              
+              
+              return res; 
+            }
+            double().then(data =>{
+                 console.log(data[1]);
+                stockData.find({stock:{$in:[myVal,myVal1]}}).then(data =>{
               let relLikes = data[0].likes,
                   relLikes1 = data[1].likes,
                   differentLikes,
                   differentLikes1;
-                  relLikes < relLikes1?differentLikes = relLikes - relLikes1:differentLikes = Math.abs(relLikes - relLikes1);
-                  relLikes1 < relLikes?differentLikes1 = relLikes1 - relLikes:differentLikes1 = Math.abs(relLikes1 - relLikes);
-                  relLikes === relLikes1?differentLikes = relLikes:null;
-                  relLikes1 === relLikes?differentLikes1 = relLikes1:null;
+                 relLikes<relLikes1?differentLikes = relLikes - relLikes1:differentLikes = relLikes;
+                 relLikes1<relLikes?differentLikes1 = relLikes1 - relLikes:differentLikes1 = relLikes1;
             res.status(200).json({
-              stockData:[{stock:data[0].stock,price:currentPrice1,rel_likes:differentLikes, ips:"You have already voted for this stock.Please choose another stock and tick like."},{stock:data[1].stock,price:currentPrice,rel_likes:differentLikes1, ips:"You have already voted for this stock.Please choose another stock and tick like."}]
+              stockData:[{stock:data[0].stock,price:data[0].price,rel_likes:differentLikes, ips:"You have already voted for this stock.Please choose another stock and tick like."},{stock:data[1].stock,price:data[1].price,rel_likes:differentLikes1, ips:"You have already voted for this stock.Please choose another stock and tick like."}]
               })
+            })
             })
           }
 
           if(!info){
-             let update ={
-               $set:{
-                price:currentPrice
-               },
-               $inc:{
-               likes:viewLike
-               },
-               $addToSet:{
-                 ips:ip
-               }
-               }
-
-             let update1 ={
-               $set:{
-                price:currentPrice1
-               },
-               $inc:{
-               likes:viewLike
-               },
-               $addToSet:{
-                 ips:ip
-               }
-               }
-
-            stockData.updateOne(findMe,update,{upsert:true}).then(data =>{
-                console.log(data)
-             })
-
-            stockData.updateOne(findMe1,update1,{upsert:true}).then(data =>{
-                console.log(data)
-            }).catch(err =>{console.log('No ' + err + 'found')})
-            
-            stockData.find({stock:{$in:[myVal,myVal1]}}).then(data =>{
+      
+            async function double () {
+           
+             const res = await stockData.bulkWrite([
+              { 
+               updateOne: {
+                filter: {
+                  stock: myVal
+                  },
+                update: {
+                 $set: {
+                  price:currentPrice
+                  },
+                $inc:{
+                  likes:viewLike
+                  },
+                $addToSet:{
+                  ips:ip
+                  }
+                      }
+                        }
+                },
+               { 
+               updateOne: {
+                filter: {
+                  stock: myVal1
+                        },
+                  update: {
+                $set: {
+                  price:currentPrice1
+                      },
+                $inc:{
+                 likes:viewLike
+                    },
+                $addToSet:{
+                  ips:ip
+                    }
+                        } 
+                 }
+                }
+              ]);
+              
+              return res; 
+            }
+            double().then(data =>{
+           
+              stockData.find({stock:[myVal,myVal1]}).then(data =>{
+              
               let relLikes = data[0].likes,
                   relLikes1 = data[1].likes,
                   differentLikes,
                   differentLikes1;
-                  relLikes < relLikes1?differentLikes = relLikes - relLikes1:differentLikes = Math.abs(relLikes - relLikes1);
-                  relLikes1 < relLikes?differentLikes1 = relLikes1 - relLikes:differentLikes1 = Math.abs(relLikes1 - relLikes);
-                  relLikes === relLikes1?differentLikes = relLikes:null;
-                  relLikes1 === relLikes?differentLikes1 = relLikes1:null;
+                  relLikes<relLikes1?differentLikes = relLikes - relLikes1:differentLikes = relLikes;
+                  relLikes1<relLikes?differentLikes1 = relLikes1 - relLikes:differentLikes1 = relLikes1;
+                  
                   res.status(200).json({
-                    stockData:[{stock:data[0].stock,price:currentPrice1,rel_likes:differentLikes},{stock:data[1].stock,price:currentPrice,rel_likes:differentLikes1}]
+                    stockData:[{stock:data[0].stock,price:data[0].price,rel_likes:differentLikes},{stock:data[1].stock,price:data[1].price,rel_likes:differentLikes1}]
                     })
             })
+              });
+           
           }
 
 
@@ -307,7 +425,7 @@ module.exports = function (app) {
                }
                }
                stockData.findOneAndUpdate({stock:myVal,ips:ip},update,{new:true}).then(data =>{
-                  console.log(data.ips)  
+                  //console.log(data.ips)  
                   res.status(200).json({
                   stockData:[{stock:data.stock,price:currentPrice,rel_likes:data.likes},{error:`erorr no stock named ${stockTwo} in database`}]
                })
@@ -349,7 +467,7 @@ module.exports = function (app) {
                }
                }
                stockData.findOneAndUpdate({stock:myVal1,ips:ip},update,{new:true}).then(data =>{
-                  console.log(data.ips)  
+                  //console.log(data.ips)  
                   res.status(200).json({
                    stockData:[{error:`erorr no stock named ${stockOne} in database`},{stock:data.stock,price:currentPrice1,rel_likes:data.likes}]
                })
@@ -385,7 +503,7 @@ module.exports = function (app) {
         
 
         stockData.exists(findMe).then(check =>{
-        console.log(like)
+        //console.log(like)
          if(!check&&!like){
              res.json({stockdata:{error:`erorr no stock named ${stock} in database`}})
           }
@@ -412,7 +530,7 @@ module.exports = function (app) {
             }
           }
           stockData.findOneAndUpdate(findMe,update,{new:true}).then(data =>{
-           console.log(data.ips)
+           //console.log(data.ips)
             res.status(200).json({
                stock:data.stock,
                price:currentPrice,
@@ -448,7 +566,7 @@ module.exports = function (app) {
         } 
 
          if(!check&&myVal&&like == 'true'){
-          console.log(ip)
+          
           let myStock = new stockData({
               stock:myVal,
               price:currentPrice,
@@ -484,7 +602,6 @@ module.exports = function (app) {
            stockData.exists({stock:myVal,ips:ip}).then(info =>{
              if(!info){
                stockData.findOneAndUpdate(findMe,update,{new:true}).then(data =>{
-            //console.log(data.ips)
              res.status(200).json({
                stock:data.stock,
                price:data.price,
@@ -501,7 +618,7 @@ module.exports = function (app) {
                }
                }
                stockData.findOneAndUpdate({stock:myVal,ips:ip},update,{new:true}).then(data =>{
-                  console.log(data.ips)  
+                  //console.log(data.ips)  
                   res.status(200).json({
                   stockData:{
                    stock:data.stock,
